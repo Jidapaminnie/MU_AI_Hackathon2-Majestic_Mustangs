@@ -83,3 +83,6 @@ if messages[-1]["role"] != "assistant":
             st.write(response)
             message = {"role": "assistant", "content": response}
             st.session_state.messages.append(message) # Add response to message history
+
+# command to run streamlit page
+# streamlit run smth.py

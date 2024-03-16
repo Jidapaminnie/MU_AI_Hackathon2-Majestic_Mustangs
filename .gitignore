@@ -1,5 +1,6 @@
-service_account.json
+/tutorial_notebooks/credentials
 
+service_account.json
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
