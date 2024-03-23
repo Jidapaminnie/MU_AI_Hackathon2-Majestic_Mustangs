@@ -87,8 +87,6 @@ def chat_query():
                 "You are a chatbot in the receiptionist in the hospital, you should have normal interactions, as well as talk. Do not hallucinate. "
             ),
         )
-        print("context_template")
-        print(chat_engine._context_template)
 
         # 2. 
         res = chat_engine.chat(text)
