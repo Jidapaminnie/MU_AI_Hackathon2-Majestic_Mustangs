@@ -5,8 +5,8 @@ import os
 import uuid
 
 log_path = os.path.join("data", "log_appointment.csv")
-COLS = ['uuid', 'doctorID', 'patientName', 'datetimeStart', 'datetimeEnd', 'duration_hr']
-datetimeFormat = "%a, %d %b %Y %H:%M:%S"
+COLS = ['uuid', 'doctorID', 'patientName', 'datetimeStart', 'datetimeEnd', 'duration_min']
+datetimeFormat = "day of the week: %a, day: %d, month: %b, year: %Y, time: %H:%M:%S"
 
 def write_row_csv(path, new_row):
     with open(path, 'a') as csvfile:
@@ -38,15 +38,15 @@ def check_time_validity(datetimeStart, duration_hr, datetimeEnd):
 
 
 def add_appointment(doctorID: int, patientName: str, datetimeStart: datetime, # required
-                    duration_hr: int = 1, datetimeEnd: datetime=None):
+                    duration_min: int = 1, datetimeEnd: datetime=None):
     ''' 
-    Must specify (datetimeStart & duration_hr) OR (datetimeStart & datetimeEnd). If both are true, duration_hr is changed based on datetimeEnd
+    Must specify (datetimeStart & duration_min) OR (datetimeStart & datetimeEnd). If both are true, duration_hr is changed based on datetimeEnd
     '''
     
 
     duration_hr, datetimeEnd = check_time_validity(datetimeStart, duration_hr, datetimeEnd)
 
-    status, overlap = check_appointment_overlap(doctorID, datetimeStart, duration_hr, datetimeEnd)
+    status, overlap = check_appointment_overlap(doctorID, datetimeStart, duration_min, datetimeEnd)
     assert status, overlap
     app_dict = {}
     app_dict['appointment_uuid'] = uuid.uuid4()
@@ -54,7 +54,7 @@ def add_appointment(doctorID: int, patientName: str, datetimeStart: datetime, # 
     app_dict['patientName'] = patientName
     app_dict['datetimeStart'] = datetimeStart.isoformat()# .strftime(datetimeFormat)
     app_dict['datetimeEnd'] = datetimeEnd.isoformat()# .strftime(datetimeFormat)
-    app_dict['duration_hr'] = duration_hr
+    app_dict['duration_min'] = duration_min
     write_row_csv(log_path, app_dict)
     return app_dict
 

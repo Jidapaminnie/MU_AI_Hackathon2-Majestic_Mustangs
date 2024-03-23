@@ -1,4 +1,6 @@
 from datetime import datetime, timezone, timedelta
+import dateparser
+import json
 from google.oauth2 import service_account
 from google.cloud import aiplatform
 from vertexai.language_models import TextGenerationModel, TextEmbeddingModel
@@ -57,11 +59,56 @@ def get_intent_from_chat(text:str) -> UserIntent:
     return UserIntent.unknown
 
 def get_datetime_from_chat(text:str):
-    prompt = f"Today is {datetime.now(DEFAULT_TZ).isoformat()}. Your task is to retrive datetime of a given text. You should answer only a datetime string in ISO format. If the text is not related to what previous sentence mentioned, please answer 'unknown'. Text: `{text}`"
+    prompt = f"Your task is to retrive datetime of a given text. You should answer only a datetime string in ISO format, eg. '03 March 2024 at 8:08 PM' should be turn into '2024-03-23T20:08:00'. If the text is not related to what previous sentence mentioned, please answer 'unknown'. Text: `{text}`"
     dt = get_completion(prompt).strip()
     try:
-        dt = datetime.fromisoformat(dt)
+        dt = dt.fromisoformat()
         return dt
     except Exception:
         # print(f"cant parse dt({dt})")
         return "unknown"
+
+def get_appointment_from_chat(chat_history:str):
+    prompt = ("Your task is to summarize a medical appointment of a given chat history between a user and chat bot.\n"
+              "You should be able to make a summary in JSON from consist of the following topic 'appointment datetime', 'duration', 'doctor name', 'patient name'\n"
+              "The appointment datetime must be in ISO format, eg. '03 March 2024 at 8:08 PM' should be turn into '2024-03-23T20:08:00'.\n"
+              "If the user does not specify the duration of the appointment, make it default to 1 hours. And write it in term of minutes, eg. '1 ชม. ครึ่ง' should be '90'.\n"
+              "If anything you do not know about any of the topic, just put `idk`.\n"
+              "Chat history will be written in this template '`Name`: `Text`' alternate between User and chat bot\n"
+              "Chat history will be written below\n"
+              "======================"
+              f"{chat_history}"
+              "======================")
+    print(chat_history)
+    data = get_completion(prompt).strip() # hopefully json
+    data = "\n".join(data.split("\n")[1: -1])
+    # raw res is surrounded with ```
+    print("raw data from prompt", data)
+    try:
+        data = json.loads(data)
+        data["appointment_datetime"] = dateparser.parse(data["appointment_datetime"])
+        return data
+    except Exception:
+        return "fukng stupid"
+
+def get_date_from_chat(text:str):
+    prompt = ("Your task is to find a date time related keyword.\n"
+              "For example for input \n"
+              "The appointment datetime must be in ISO format, eg. '03 March 2024 at 8:08 PM' should be turn into '2024-03-23T20:08:00'.\n"
+              "If the user does not specify the duration of the appointment, make it default to 1 hours. And write it in term of minutes, eg. '1 ชม. ครึ่ง' should be '90'.\n"
+              "Chat history will be written in this template '`Name`: `Text`' alternate between User and chat bot\n"
+              "Chat history will be written below\n"
+              "======================"
+              f"{text}"
+              "======================")
+    # print(text)
+    data = get_completion(prompt).strip() # hopefully json
+    data = "\n".join(data.split("\n")[1: -1])
+    # raw res is surrounded with ```
+    # print(data)
+    try:
+        data = json.loads(data)
+        return data
+    except Exception:
+        return "fukng stupid"
+
