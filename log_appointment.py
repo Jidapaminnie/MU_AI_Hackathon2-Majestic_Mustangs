@@ -52,8 +52,8 @@ def add_appointment(doctorID: int, patientName: str, datetimeStart: datetime, # 
     app_dict['appointment_uuid'] = uuid.uuid4()
     app_dict['doctorID'] = doctorID
     app_dict['patientName'] = patientName
-    app_dict['datetimeStart'] = datetimeStart.strftime(datetimeFormat)
-    app_dict['datetimeEnd'] = datetimeEnd.strftime(datetimeFormat)
+    app_dict['datetimeStart'] = datetimeStart.isoformat()# .strftime(datetimeFormat)
+    app_dict['datetimeEnd'] = datetimeEnd.isoformat()# .strftime(datetimeFormat)
     app_dict['duration_hr'] = duration_hr
     write_row_csv(log_path, app_dict)
     return app_dict
@@ -83,8 +83,8 @@ def check_appointment_overlap(doctorID, datetimeStart: datetime,
     df = df[df["doctorID"] == doctorID]
     l = []
     for i, log in df.iterrows():
-        if (datetimeStart < datetime.strptime(log['datetimeEnd'], datetimeFormat)) and (datetime.strptime(log['datetimeStart'], datetimeFormat) < datetimeEnd):
-
+        # if (datetimeStart < datetime.strptime(log['datetimeEnd'], datetimeFormat)) and (datetime.strptime(log['datetimeStart'], datetimeFormat) < datetimeEnd):
+        if (datetimeStart < datetime.fromisoformat(log['datetimeEnd'])) and (datetime.fromisoformat(log['datetimeStart']) < datetimeEnd) :
             l.append(log)
     if len(l) > 0:
         return False, l # overlap
@@ -93,9 +93,9 @@ def check_appointment_overlap(doctorID, datetimeStart: datetime,
 
 
 
-# create_appoint_log()
-# add_appointment(0, "patient A", datetime(2024, 12, 12, 14, 30))
-# add_appointment(0, "patient B", datetime(2024, 12, 12, 15, 30))
+create_appoint_log()
+add_appointment(0, "patient A", datetime(2024, 12, 12, 14, 30))
+add_appointment(0, "patient B", datetime(2024, 12, 12, 15, 30))
 # add_appointment(0, "patient D", datetime(2024, 12, 12, 16, 30), 0.5)
 # add_appointment(0, "patient C", datetime(2024, 12, 13, 12, 00), 2, datetime(2024, 12, 13, 17, 30))
 # check_appointment_overlap(0, datetime(2024, 12, 12, 15, 00))
