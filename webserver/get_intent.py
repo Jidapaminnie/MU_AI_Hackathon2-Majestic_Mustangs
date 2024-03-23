@@ -34,14 +34,14 @@ class UserIntent(Enum):
     unknown=4
 
 def get_completion(prompt: str, temperature: float = 0.0, top_p: float = 0.95, top_k: int = 40, max_output_tokens: int = 2048):
-        parameters = {
-            'temperature': temperature,
-            'top_p': top_p,
-            'top_k': top_k,
-            'max_output_tokens': max_output_tokens
-        }
-        # return gen_model.predict(prompt, **parameters).text
-        return chat_vertex_ai.predict(prompt, **parameters)
+    parameters = {
+        'temperature': temperature,
+        'top_p': top_p,
+        'top_k': top_k,
+        'max_output_tokens': max_output_tokens
+    }
+    # return gen_model.predict(prompt, **parameters).text
+    return chat_vertex_ai.predict(prompt, **parameters)
 
 def get_intent_from_chat(text:str) -> UserIntent:
     prompt = f"Your task is to retrive intention of a given text. You should answer only 'medical experts' when the text is about finding medical expert, 'making appointment' when the text is about making appointment to the medical expert, 'chief complaint' when the text is about symptom. If the text is not related to what previous sentence mentioned, please answer 'unknown'. Text: `{text}`"
