@@ -93,9 +93,9 @@ def check_appointment_overlap(doctorID, datetimeStart: datetime,
 
 
 
-create_appoint_log()
-add_appointment(0, "patient A", datetime(2024, 12, 12, 14, 30))
-add_appointment(0, "patient B", datetime(2024, 12, 12, 15, 30))
+# create_appoint_log()
+# add_appointment(0, "patient A", datetime(2024, 12, 12, 14, 30))
+# add_appointment(0, "patient B", datetime(2024, 12, 12, 15, 30))
 # add_appointment(0, "patient D", datetime(2024, 12, 12, 16, 30), 0.5)
 # add_appointment(0, "patient C", datetime(2024, 12, 13, 12, 00), 2, datetime(2024, 12, 13, 17, 30))
 # check_appointment_overlap(0, datetime(2024, 12, 12, 15, 00))
