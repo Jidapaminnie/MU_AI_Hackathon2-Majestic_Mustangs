@@ -7,8 +7,10 @@ from get_intent import get_intent_from_chat, UserIntent, get_datetime_from_chat
 from SessionMemory import SessionMemory
 import log_appointment as book
 
-from llama_index.core.memory import ChatMemoryBuffer
-from llama_index.core import VectorStoreIndex
+# from llama_index.core.memory import ChatMemoryBuffer
+# from llama_index.core import VectorStoreIndex
+from llama_index.legacy.memory import ChatMemoryBuffer
+from llama_index.legacy import VectorStoreIndex
 from llama_index.legacy import (
     StorageContext,
     load_index_from_storage,
@@ -27,7 +29,7 @@ def get_index(merging_index_dir) -> VectorStoreIndex:
     automerging_index = load_index_from_storage(loaded_storage_context)
     return automerging_index
 
-index = get_index(os.getenv("MERGING_INDEX_DIR"))
+index = get_index(os.getenv("CLINIC_INDEX_DIR"))
 chatbot_name = "chat bot"
 
 app = Flask(__name__)
@@ -85,6 +87,8 @@ def chat_query():
                 "You are a chatbot in the receiptionist in the hospital, you should have normal interactions, as well as talk. Do not hallucinate. "
             ),
         )
+        print("context_template")
+        print(chat_engine._context_template)
 
         # 2. 
         res = chat_engine.chat(text)
