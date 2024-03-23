@@ -1,3 +1,4 @@
+from datetime import datetime, timezone, timedelta
 from google.oauth2 import service_account
 from google.cloud import aiplatform
 from vertexai.language_models import TextGenerationModel, TextEmbeddingModel
@@ -14,6 +15,7 @@ load_dotenv()
 emb_model_name = "textembedding-gecko-multilingual@001"
 gen_model_name  = "text-bison"
 service_account_path = os.getenv("SERVICE_ACCOUNT_PATH")
+DEFAULT_TZ = timezone(timedelta(hours=7))
 
 credentials = service_account.Credentials.from_service_account_file(service_account_path)
 aiplatform.init(project=credentials.project_id, credentials=credentials)
@@ -22,7 +24,7 @@ aiplatform.init(project=credentials.project_id, credentials=credentials)
 embed_model = VertexAIEmbeddings(model_name='textembedding-gecko-multilingual@latest')
 
 # vertex_ai = Vertex(model="text-bison", project=credentials.project_id, location= "asia-southeast1", credentials=credentials, temperature=0.2)
-chat_vertex_ai = ChatVertexAI(model_name="chat-bison-32k", project=credentials.project_id, location= "asia-southeast1", credentials=credentials, temperature=0.2, max_output_tokens= 8192) # max for bison 32k                                 
+chat_vertex_ai = ChatVertexAI(model_name="chat-bison-32k", project=credentials.project_id, location= "asia-southeast1", credentials=credentials, temperature=0.2, max_output_tokens= 8192) # max for bison 32k
 
 service_context = ServiceContext.from_defaults(llm=chat_vertex_ai, embed_model=embed_model, chunk_size=1024, chunk_overlap=20)
 set_global_service_context(service_context)
@@ -44,10 +46,22 @@ def get_completion(prompt: str, temperature: float = 0.0, top_p: float = 0.95, t
     return chat_vertex_ai.predict(prompt, **parameters)
 
 def get_intent_from_chat(text:str) -> UserIntent:
-    prompt = f"Your task is to retrive intention of a given text. You should answer only 'medical experts' when the text is about finding medical expert, 'making appointment' when the text is about making appointment to the medical expert, 'chief complaint' when the text is about symptom. If the text is not related to what previous sentence mentioned, please answer 'unknown'. Text: `{text}`"
+    prompt = f"Your task is to retrive user intention of a given text. The text will contain history of user and chat bot. You should answer only 'medical experts' when the text is about finding medical expert, 'making appointment' when the text is about making appointment to the medical expert, 'chief complaint' when the text is about symptom. The most informative text is probably user's latest message. If the text is not related to what previous sentence mentioned, please answer 'unknown'.\nChatlog:\n{text}"
     intent = get_completion(prompt).strip()
-    if intent in ["medical experts", "making appointment", "chief complaint"]:
-        return intent
-    return "unknown"
+    if intent == "medical experts":
+        return UserIntent.medical_experts
+    if intent == "making appointment":
+        return UserIntent.making_appointment
+    if intent == "chief complaint":
+        return UserIntent.chief_complaint
+    return UserIntent.unknown
 
-
+def get_datetime_from_chat(text:str):
+    prompt = f"Today is {datetime.now(DEFAULT_TZ).isoformat()}. Your task is to retrive datetime of a given text. You should answer only a datetime string in ISO format. If the text is not related to what previous sentence mentioned, please answer 'unknown'. Text: `{text}`"
+    dt = get_completion(prompt).strip()
+    try:
+        dt = datetime.fromisoformat(dt)
+        return dt
+    except Exception:
+        # print(f"cant parse dt({dt})")
+        return "unknown"
