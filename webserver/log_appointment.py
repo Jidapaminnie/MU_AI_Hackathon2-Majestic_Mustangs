@@ -5,15 +5,16 @@ import os
 import uuid
 
 log_path = os.path.join("data", "log_appointment.csv")
-COLS = ['uuid', 'doctorID', 'patientName', 'datetimeStart', 'datetimeEnd', 'duration_min']
+COLS = ['uuid', 'doctorID', 'patientName', 'datetimeStart', 'duration_min']
 datetimeFormat = "day of the week: %a, day: %d, month: %b, year: %Y, time: %H:%M:%S"
 
 def write_row_csv(path, new_row):
     with open(path, 'a') as csvfile:
-        csvwriter = csv.writer(csvfile)
-        if isinstance(new_row, dict):
-            csvwriter.writerow(new_row.values())
-        else: csvwriter.writerow(new_row)
+        # csvwriter = csv.writer(csvfile)
+        # if isinstance(new_row, dict):
+        #     csvwriter.writerow(new_row.values())
+        # else: csvwriter.writerow(new_row)
+        csvfile.write(f"{str(new_row)}\n")
 
 
 def create_appoint_log(num_week=5, log_path=log_path, delete_existing=True):
@@ -44,18 +45,19 @@ def add_appointment(doctorID: int, patientName: str, datetimeStart: datetime, # 
     '''
     
 
-    duration_hr, datetimeEnd = check_time_validity(datetimeStart, duration_hr, datetimeEnd)
+    # duration_hr, datetimeEnd = check_time_validity(datetimeStart, duration_hr, datetimeEnd)
 
-    status, overlap = check_appointment_overlap(doctorID, datetimeStart, duration_min, datetimeEnd)
-    assert status, overlap
+    # status, overlap = check_appointment_overlap(doctorID, datetimeStart, duration_min, datetimeEnd)
+    # assert status, overlap
+    print(doctorID, patientName, datetimeStart, duration_min)
     app_dict = {}
     app_dict['appointment_uuid'] = uuid.uuid4()
     app_dict['doctorID'] = doctorID
     app_dict['patientName'] = patientName
     app_dict['datetimeStart'] = datetimeStart.isoformat()# .strftime(datetimeFormat)
-    app_dict['datetimeEnd'] = datetimeEnd.isoformat()# .strftime(datetimeFormat)
+    # app_dict['datetimeEnd'] = datetimeEnd.isoformat()# .strftime(datetimeFormat)
     app_dict['duration_min'] = duration_min
-    write_row_csv(log_path, app_dict)
+    write_row_csv(log_path, f"{uuid.uuid4()}, {doctorID}, {patientName}, {datetimeStart.isoformat()}, {duration_min}")
     return app_dict
 
 def get_appointment_by_doctor(doctorID:int, log_path=log_path):

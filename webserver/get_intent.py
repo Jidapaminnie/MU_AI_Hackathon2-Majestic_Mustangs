@@ -48,7 +48,7 @@ def get_completion(prompt: str, temperature: float = 0.0, top_p: float = 0.95, t
     return chat_vertex_ai.predict(prompt, **parameters)
 
 def get_intent_from_chat(text:str) -> UserIntent:
-    prompt = f"Your task is to retrive user intention of a given text. The text will contain history of user and chat bot. You should answer only 'medical experts' when the text is about finding medical expert, 'making appointment' when the text is about making appointment to the medical expert, 'chief complaint' when the text is about symptom. The most informative text is probably user's latest message. If the text is not related to what previous sentence mentioned, please answer 'unknown'.\nChatlog:\n{text}"
+    prompt = f"Your task is to retrive user intention of a given text. The text will contain history of user and chat bot. You should answer only 'medical experts' when the text is about finding medical expert, 'making appointment' when the text is about making appointment to the medical expert, 'chief complaint' when the text is about symptoms and opening hours. The most informative text is probably user's latest message. If the text is not related to what previous sentence mentioned, please answer 'unknown'.\nChatlog:\n{text}"
     intent = get_completion(prompt).strip()
     if intent == "medical experts":
         return UserIntent.medical_experts
@@ -71,7 +71,7 @@ def get_datetime_from_chat(text:str):
 def get_appointment_from_chat(chat_history:str):
     prompt = ("Your task is to summarize a medical appointment of a given chat history between a user and chat bot.\n"
               "You should be able to make a summary in JSON from consist of the following topic 'appointment datetime', 'duration', 'doctor name', 'patient name'\n"
-              "The appointment datetime must be in ISO format, eg. '03 March 2024 at 8:08 PM' should be turn into '2024-03-23T20:08:00'.\n"
+              "The appointment datetime must be in ISO format, eg. '03 มีนาคม 2024 2 ทุ่ม 8 นาที' should be turn into '2024-03-23T20:08:00'.\n"
               "If the user does not specify the duration of the appointment, make it default to 1 hours. And write it in term of minutes, eg. '1 ชม. ครึ่ง' should be '90'.\n"
               "If anything you do not know about any of the topic, just put `idk`.\n"
               "Chat history will be written in this template '`Name`: `Text`' alternate between User and chat bot\n"

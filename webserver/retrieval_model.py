@@ -68,20 +68,21 @@ from llama_index.legacy.node_parser import get_leaf_nodes
 from llama_index.legacy import Document
 
 import log_appointment as logapp
+from get_intent import chat_vertex_ai
 
 
-credentials = service_account.Credentials.from_service_account_file("credentials/vertex-test-417403-ce72ad032af7.json")
-vertex_ai = Vertex(model="text-bison", project=credentials.project_id, location= "asia-southeast1", credentials=credentials, temperature=0.2)
-langchain_chat_vertex_ai = LangChainLLM(ChatVertexAI(model_name="chat-bison@002", project=credentials.project_id, location= "asia-southeast1", credentials=credentials, temperature=0.2))
-selected_model = langchain_chat_vertex_ai
-embed_model = LangchainEmbedding(VertexAIEmbeddings(model_name='textembedding-gecko-multilingual@latest'))
+# credentials = service_account.Credentials.from_service_account_file("credentials/vertex-test-417403-ce72ad032af7.json")
+# vertex_ai = Vertex(model="text-bison", project=credentials.project_id, location= "asia-southeast1", credentials=credentials, temperature=0.2)
+# langchain_chat_vertex_ai = LangChainLLM(ChatVertexAI(model_name="chat-bison@002", project=credentials.project_id, location= "asia-southeast1", credentials=credentials, temperature=0.2))
+# selected_model = langchain_chat_vertex_ai
+# embed_model = LangchainEmbedding(VertexAIEmbeddings(model_name='textembedding-gecko-multilingual@latest'))
 
-service_context = ServiceContext.from_defaults(llm=vertex_ai, embed_model=embed_model, chunk_size=1024, chunk_overlap=20)
-set_global_service_context(service_context)
+# service_context = ServiceContext.from_defaults(llm=vertex_ai, embed_model=embed_model, chunk_size=1024, chunk_overlap=20)
+# set_global_service_context(service_context)
 
 
 # select index
-clinic_doctor_index_dir = "./clinic_doctor_index"
+clinic_doctor_index_dir = os.getenv("CLINIC_INDEX_DIR")
 loaded_storage_context = StorageContext.from_defaults(persist_dir=clinic_doctor_index_dir) # load the existing index
 clinic_doctor_index = load_index_from_storage(loaded_storage_context)
 
@@ -95,7 +96,7 @@ automerging_retriever = AutoMergingRetriever(
 
 # create query engine
 reorder = LongContextReorder()
-hyde = HyDEQueryTransform(llm=vertex_ai, include_original=True)
+hyde = HyDEQueryTransform(llm=chat_vertex_ai, include_original=True)
 retriever_query_engine = RetrieverQueryEngine.from_args(automerging_retriever,
                                               node_postprocessors=[reorder],
                                               )
@@ -153,8 +154,9 @@ transform_query_engine.update_prompts(
 
 # main function to get output
 def get_response(query):
+    print("query", query)
     response = transform_query_engine.query(query)
-
+    print("retrieval", response)
     # retrieved_nodes = automerging_retriever.retrieve(query)
     # context_str = "\n\n".join([n.get_content() for n in retrieved_nodes])
     return response #, context_str
