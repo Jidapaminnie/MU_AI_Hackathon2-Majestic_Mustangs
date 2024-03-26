@@ -9,17 +9,19 @@ This chatbot was built using Vertex AI models.
 - Data extraction using web scraping
 - Index creation and data querying using Llama Index and Langchain
 - Web service development using Flask
-- Web deployment and UI development using 
+- Web deployment and UI development using React.js (See [Front-end section](#frontend))
 
 ## Scrape data
 
-See the folder `scripts`.
+See `readme.md` the folder `scripts`.
 
 ## Running the webservice
 
 ### Prerequisites
 
-#### Create Index directory
+#### Create Index directories
+
+Ran every cell in the `tutorial_notebooks/index_creation.ipynb` to create indices.
 
 #### .env file
 
@@ -79,13 +81,15 @@ It will return json of the following
 ## Frontend
 
 We also develop a front end UI that is meant to be integrated with this repository. See
-[github.com/makorn645/muai-2024-majestic-mustangs-frontend](https://github.com/makorn645/muai-2024-majestic-mustangs-frontend)
+[github.com/makorn645/muai-2024-majestic-mustangs-frontend](https://github.com/makorn645/muai-2024-majestic-mustangs-frontend).
 
 ## Authors
 
+The member of Majestic Mustangs
+
 - [Danaidech Ardsamai](https://github.com/nungsorb)
-- [Jidapa](https://github.com/Jidapaminnie) 
+- [Jidapa Chaocanapricha](https://github.com/Jidapaminnie) 
 - [Makornthawat E Emery](https://github.com/makorn645)
 - [Napahatai Sittirit](https://github.com/pinglarin)
 - [Phuriwat Angkoondittaphong](https://github.com/ACitronella)
->>>>>>> Stashed changes
+
