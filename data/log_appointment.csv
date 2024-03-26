@@ -1,1 +1,1 @@
-uuid,doctorID,patientName,datetimeStart,datetimeEnd,duration_hr
+['uuid', 'doctorID', 'patientName', 'datetimeStart', 'duration_min']
